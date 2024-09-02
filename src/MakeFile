@@ -1,0 +1,14 @@
+CC = gcc
+C_STD = -std=c99
+TARGET = bin/main
+INCLUDE = ../include
+LIB = lib
+LIBS = -lmingw32 -lSDL2main -lSDL2 -lglfw3 -lopengl32 -lgdi32
+MAIN = ../glad.c shader_reader.c 
+
+run : compile
+	./bin/main
+
+compile :
+	$(CC) -c $(C_STD) -I $(INCLUDE) -L $(LIB) -o $(TARGET) $(MAIN) $(LIBS)
+
