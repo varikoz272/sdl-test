@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "include/glad/glad.h"
-#include "include/GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "src/shader_reader.h"
 
-char *read_all_file(char file_name[]);
+#include <iostream>
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -12,18 +13,18 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// const char *vertexShaderSource = "#version 330 core\n"
-//     "layout (location = 0) in vec3 aPos;\n"
-//     "void main()\n"
-//     "{\n"
-//     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-//     "}\0";
-// const char *fragmentShaderSource = "#version 330 core\n"
-//     "out vec4 FragColor;\n"
-//     "void main()\n"
-//     "{\n"
-//     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-//     "}\n\0";
+const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n\0";
 
 int main()
 {
@@ -38,14 +39,12 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    const char *vertexShaderSource = read_all_file("resources/shader.vs");
-    const char *fragmentShaderSource = read_all_file("resources/shader.fs");
-
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
+        std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -56,6 +55,7 @@ int main()
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
+        std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
@@ -73,6 +73,7 @@ int main()
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     // fragment shader
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -83,6 +84,7 @@ int main()
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     // link shaders
     unsigned int shaderProgram = glCreateProgram();
@@ -93,6 +95,7 @@ int main()
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -162,10 +165,6 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
-
-    free(vertexShaderSource);
-    free(fragmentShaderSource);
-
     return 0;
 }
 
@@ -174,7 +173,7 @@ int main()
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, 1);
+        glfwSetWindowShouldClose(window, true);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
